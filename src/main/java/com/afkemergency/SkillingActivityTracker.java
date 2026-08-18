@@ -4,6 +4,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
 import net.runelite.api.Skill;
+import net.runelite.api.gameval.AnimationID;
 
 final class SkillingActivityTracker
 {
@@ -38,6 +39,35 @@ final class SkillingActivityTracker
             trackedAt = now;
         }
         return tracked;
+    }
+
+    static boolean isMotherlodeMiningAnimation(int animation)
+    {
+        switch (animation)
+        {
+            case AnimationID.HUMAN_MINING_BRONZE_PICKAXE_WALL:
+            case AnimationID.HUMAN_MINING_IRON_PICKAXE_WALL:
+            case AnimationID.HUMAN_MINING_STEEL_PICKAXE_WALL:
+            case AnimationID.HUMAN_MINING_BLACK_PICKAXE_WALL:
+            case AnimationID.HUMAN_MINING_MITHRIL_PICKAXE_WALL:
+            case AnimationID.HUMAN_MINING_ADAMANT_PICKAXE_WALL:
+            case AnimationID.HUMAN_MINING_RUNE_PICKAXE_WALL:
+            case AnimationID.HUMAN_MINING_GILDED_PICKAXE_WALL:
+            case AnimationID.HUMAN_MINING_DRAGON_PICKAXE_WALL:
+            case AnimationID.HUMAN_MINING_DRAGON_PICKAXE_PRETTY_WALL:
+            case AnimationID.HUMAN_MINING_ZALCANO_PICKAXE_WALL:
+            case AnimationID.HUMAN_MINING_TRAILBLAZER_PICKAXE_NO_INFERNAL_WALL:
+            case AnimationID.HUMAN_MINING_INFERNAL_PICKAXE_WALL:
+            case AnimationID.HUMAN_MINING_TRAILBLAZER_PICKAXE_WALL:
+            case AnimationID.HUMAN_MINING_TRAILBLAZER_RELOADED_PICKAXE_WALL:
+            case AnimationID.HUMAN_MINING_3A_PICKAXE_WALL:
+            case AnimationID.HUMAN_MINING_CRYSTAL_PICKAXE_WALL:
+            case AnimationID.HUMAN_MINING_LEAGUE_TRAILBLAZER_PICKAXE_WALL:
+            case AnimationID.HUMAN_MINING_TRAILBLAZER_RELOADED_PICKAXE_NO_INFERNAL_WALL:
+                return true;
+            default:
+                return false;
+        }
     }
 
     void clearAnimation()

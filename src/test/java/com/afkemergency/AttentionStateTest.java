@@ -28,6 +28,15 @@ public class AttentionStateTest
     }
 
     @Test
+    public void trustedMotherlodeSwingCanArmImmediately()
+    {
+        AttentionState state = new AttentionState();
+        assertFalse(state.update(0, true, false, 0, 2_000));
+        assertFalse(state.update(500, false, false, 3_000, 2_000));
+        assertTrue(state.update(2_500, false, false, 3_000, 2_000));
+    }
+
+    @Test
     public void movementDisarmsPendingAlert()
     {
         AttentionState state = new AttentionState();

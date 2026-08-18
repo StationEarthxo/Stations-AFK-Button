@@ -130,7 +130,8 @@ public class AfkEmergencyPlugin extends Plugin
 
         long now = System.currentTimeMillis();
         int animation = player.getAnimation();
-        boolean animating = skillingActivity.isTrackedAnimation(animation, now);
+        boolean motherlodeMining = SkillingActivityTracker.isMotherlodeMiningAnimation(animation);
+        boolean animating = motherlodeMining || skillingActivity.isTrackedAnimation(animation, now);
         boolean moving = player.getPoseAnimation() != player.getIdlePoseAnimation();
         if (animation != -1 && !animating)
         {
@@ -144,7 +145,7 @@ public class AfkEmergencyPlugin extends Plugin
             now,
             animating,
             moving,
-            config.minimumActivitySeconds() * 1000L,
+            motherlodeMining ? 0L : config.minimumActivitySeconds() * 1000L,
             config.idleDelaySeconds() * 1000L
         );
         if (alertStarted)

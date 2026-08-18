@@ -8,7 +8,8 @@ Hold Alt while the button is visible to drag or resize its RuneLite overlay. Its
 
 ## Current detection
 
-- Arms only after a supported gathering or production skill gains XP and its matching animation continues for the configured duration.
+- Arms after a supported gathering or production skill gains XP and its matching animation continues for the configured duration.
+- Recognizes Motherlode Mine ore-vein animations directly, so a completed wall-mining action does not need to wait for the normal activity timer.
 - Fires when that animation stops and the player remains idle for the configured grace period.
 - Disarms on any mouse press, logout, movement, or unrelated animation such as a home teleport.
 - Includes a configurable preview hotkey for testing the button and dismissal animation.

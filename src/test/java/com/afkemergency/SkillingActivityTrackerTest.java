@@ -1,6 +1,7 @@
 package com.afkemergency;
 
 import net.runelite.api.Skill;
+import net.runelite.api.gameval.AnimationID;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -27,5 +28,15 @@ public class SkillingActivityTrackerTest
         tracker.onExperience(Skill.MAGIC, 2_000, 4_840, 0);
         tracker.onExperience(Skill.MAGIC, 2_035, 4_840, 1_000);
         assertFalse(tracker.isTrackedAnimation(4_840, 1_000));
+    }
+
+    @Test
+    public void recognizesMotherlodeWallMiningWithoutExperienceLearning()
+    {
+        assertTrue(SkillingActivityTracker.isMotherlodeMiningAnimation(
+            AnimationID.HUMAN_MINING_RUNE_PICKAXE_WALL));
+        assertFalse(SkillingActivityTracker.isMotherlodeMiningAnimation(
+            AnimationID.HUMAN_MINING_RUNE_PICKAXE));
+        assertFalse(SkillingActivityTracker.isMotherlodeMiningAnimation(-1));
     }
 }
