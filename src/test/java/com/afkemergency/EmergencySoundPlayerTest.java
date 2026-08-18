@@ -21,6 +21,18 @@ public class EmergencySoundPlayerTest
         assertEquals(-500, decode(half, 2));
     }
 
+    @Test
+    public void waveContainerHasHeaderAndPcmPayload()
+    {
+        byte[] pcm = {1, 2, 3, 4};
+        byte[] wave = EmergencySoundPlayer.toWave(pcm);
+
+        assertEquals(48, wave.length);
+        assertArrayEquals(new byte[]{'R', 'I', 'F', 'F'},
+            new byte[]{wave[0], wave[1], wave[2], wave[3]});
+        assertArrayEquals(pcm, new byte[]{wave[44], wave[45], wave[46], wave[47]});
+    }
+
     private static short decode(byte[] pcm, int index)
     {
         return (short) ((pcm[index * 2] & 0xff) | (pcm[index * 2 + 1] << 8));

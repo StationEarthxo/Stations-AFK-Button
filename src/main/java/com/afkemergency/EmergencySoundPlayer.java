@@ -1,28 +1,30 @@
 package com.afkemergency;
 
+import java.io.ByteArrayInputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
+import net.runelite.client.audio.AudioPlayer;
 
 @Singleton
 final class EmergencySoundPlayer
 {
     private static final float SAMPLE_RATE = 44_100F;
-    private static final AudioFormat FORMAT = new AudioFormat(SAMPLE_RATE, 16, 1, true, false);
     private static final short[] ALERT = createAlert();
     private static final short[] PRESS = createPress();
 
+    private final AudioPlayer audioPlayer;
     private ExecutorService executor;
 
     @Inject
-    private EmergencySoundPlayer()
+    private EmergencySoundPlayer(AudioPlayer audioPlayer)
     {
+        this.audioPlayer = audioPlayer;
     }
 
     synchronized void startUp()
@@ -69,7 +71,7 @@ final class EmergencySoundPlayer
         byte[] pcm = toPcm(samples, gain);
         try
         {
-            executor.execute(() -> output(pcm));
+            executor.execute(() -> output(toWave(pcm)));
         }
         catch (RejectedExecutionException ignored)
         {
@@ -77,29 +79,36 @@ final class EmergencySoundPlayer
         }
     }
 
-    private static void output(byte[] pcm)
+    private void output(byte[] wave)
     {
-        SourceDataLine line = null;
-        try
+        try (ByteArrayInputStream input = new ByteArrayInputStream(wave))
         {
-            line = AudioSystem.getSourceDataLine(FORMAT);
-            line.open(FORMAT, pcm.length);
-            line.start();
-            line.write(pcm, 0, pcm.length);
-            line.drain();
+            audioPlayer.play(input, 0F);
         }
-        catch (LineUnavailableException | IllegalArgumentException ignored)
+        catch (Exception ignored)
         {
             // Audio is optional; a missing output device must never affect the alert.
         }
-        finally
-        {
-            if (line != null)
-            {
-                line.stop();
-                line.close();
-            }
-        }
+    }
+
+    static byte[] toWave(byte[] pcm)
+    {
+        ByteBuffer wave = ByteBuffer.allocate(44 + pcm.length).order(ByteOrder.LITTLE_ENDIAN);
+        wave.put("RIFF".getBytes(StandardCharsets.US_ASCII));
+        wave.putInt(36 + pcm.length);
+        wave.put("WAVE".getBytes(StandardCharsets.US_ASCII));
+        wave.put("fmt ".getBytes(StandardCharsets.US_ASCII));
+        wave.putInt(16);
+        wave.putShort((short) 1);
+        wave.putShort((short) 1);
+        wave.putInt((int) SAMPLE_RATE);
+        wave.putInt((int) SAMPLE_RATE * 2);
+        wave.putShort((short) 2);
+        wave.putShort((short) 16);
+        wave.put("data".getBytes(StandardCharsets.US_ASCII));
+        wave.putInt(pcm.length);
+        wave.put(pcm);
+        return wave.array();
     }
 
     static byte[] toPcm(short[] samples, double gain)
